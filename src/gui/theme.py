@@ -8,7 +8,7 @@ QMainWindow, QDialog {
 
 QWidget {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    font-size: 13px;
+    font-size: 10pt;
     color: #cdd6f4;
 }
 
@@ -74,7 +74,7 @@ QPushButton#secondaryButton:hover {
     background-color: #45475a;
 }
 
-QLineEdit, QTextEdit, QPlainTextEdit {
+QLineEdit, QTextEdit, QPlainTextEdit, QTextBrowser {
     background-color: #11111b;
     color: #cdd6f4;
     border: 1px solid #313244;
@@ -84,14 +84,23 @@ QLineEdit, QTextEdit, QPlainTextEdit {
     selection-color: #11111b;
 }
 
-QLineEdit:focus, QTextEdit:focus, QPlainTextEdit:focus {
+QLineEdit:focus, QTextEdit:focus, QPlainTextEdit:focus, QTextBrowser:focus {
     border: 1px solid #89b4fa;
 }
 
 QPlainTextEdit#codeView {
     font-family: "Consolas", "Courier New", monospace;
-    font-size: 12px;
+    font-size: 10pt;
     background-color: #0c0c14;
+}
+
+QTextBrowser#helpBrowser {
+    font-size: 10.5pt;
+    background-color: #11111b;
+    border: 1px solid #313244;
+    border-radius: 6px;
+    padding: 14px;
+    line-height: 1.4;
 }
 
 QScrollBar:vertical {
@@ -167,7 +176,7 @@ QMainWindow, QDialog {
 
 QWidget {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    font-size: 13px;
+    font-size: 10pt;
     color: #4c4f69;
 }
 
@@ -233,7 +242,7 @@ QPushButton#secondaryButton:hover {
     background-color: #dce0e8;
 }
 
-QLineEdit, QTextEdit, QPlainTextEdit {
+QLineEdit, QTextEdit, QPlainTextEdit, QTextBrowser {
     background-color: #ffffff;
     color: #4c4f69;
     border: 1px solid #ccd0da;
@@ -243,14 +252,23 @@ QLineEdit, QTextEdit, QPlainTextEdit {
     selection-color: #ffffff;
 }
 
-QLineEdit:focus, QTextEdit:focus, QPlainTextEdit:focus {
+QLineEdit:focus, QTextEdit:focus, QPlainTextEdit:focus, QTextBrowser:focus {
     border: 1px solid #1e66f5;
 }
 
 QPlainTextEdit#codeView {
     font-family: "Consolas", "Courier New", monospace;
-    font-size: 12px;
+    font-size: 10pt;
     background-color: #f4f5f8;
+}
+
+QTextBrowser#helpBrowser {
+    font-size: 10.5pt;
+    background-color: #ffffff;
+    border: 1px solid #ccd0da;
+    border-radius: 6px;
+    padding: 14px;
+    line-height: 1.4;
 }
 
 QScrollBar:vertical {

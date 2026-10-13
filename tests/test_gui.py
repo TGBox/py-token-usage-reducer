@@ -36,3 +36,17 @@ def test_main_window_tabs():
     assert window.current_theme == "light"
     window.set_theme("dark")
     assert window.current_theme == "dark"
+
+    # Test HelpTab rendered markdown preview
+    help_tab = window.help_tab
+    assert help_tab.doc_view.toHtml()  # Rendered HTML exists
+    assert "py-token-usage-reducer" in help_tab.doc_view.toPlainText()
+
+    # Test toggling raw markdown view
+    help_tab.raw_view_cb.setChecked(True)
+    assert "# py-token-usage-reducer" in help_tab.doc_view.toPlainText()
+    help_tab.raw_view_cb.setChecked(False)
+
+    # Test selecting a specific tool documentation
+    help_tab.tool_combo.setCurrentIndex(1)
+    assert help_tab.doc_view.toPlainText()
