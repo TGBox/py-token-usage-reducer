@@ -8,9 +8,11 @@ requires-python = ">=3.11"
 license = { text = "MIT" }
 
 dependencies = [
-
+    "beautifulsoup4>=4.15.0",
+    "pypdf>=6.20.1",
     "pyside6",
-
+    "python-docx>=1.2.0",
+    "tiktoken>=0.14.0",
 ]
 
 [project.scripts]

@@ -1,25 +1,26 @@
+"""Main entry point for py-token-usage-reducer dispatching CLI commands or GUI."""
+
 import sys
 
-from PySide6.QtWidgets import QApplication, QMainWindow, QLabel
-from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QApplication
 
-
-
-
-class MainWindow(QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("py-token-usage-reducer")
-        self.resize(800, 600)
-        label = QLabel("Hallo aus py-token-usage-reducer!", alignment=Qt.AlignmentFlag.AlignCenter)
-        self.setCentralWidget(label)
+from src.cli.parser import run_cli
+from src.gui.app import MainWindow
 
 
 def main() -> None:
-    app = QApplication(sys.argv)
-    window = MainWindow()
-    window.show()
-    sys.exit(app.exec())
+    # First check CLI arguments
+    cli_args = sys.argv[1:]
+    exit_code = run_cli(cli_args)
+
+    # Exit code 100 indicates that GUI should be launched (e.g. no args or --gui)
+    if exit_code == 100:
+        app = QApplication(sys.argv)
+        window = MainWindow()
+        window.show()
+        sys.exit(app.exec())
+    else:
+        sys.exit(exit_code)
 
 
 if __name__ == "__main__":
