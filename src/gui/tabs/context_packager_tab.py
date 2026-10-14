@@ -19,6 +19,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from src.gui.workers import TaskWorker
 from src.modules.dep_tracer import trace_dependencies
 from src.modules.diff_packager import package_git_diff
 
@@ -28,6 +29,7 @@ class ContextPackagerTab(QWidget):
 
     def __init__(self) -> None:
         super().__init__()
+        self.worker: TaskWorker | None = None
         self._init_ui()
 
     def _init_ui(self) -> None:
@@ -142,28 +144,41 @@ class ContextPackagerTab(QWidget):
                 )
                 return
 
-            res = trace_dependencies(entry_path, max_depth=self.depth_spin.value())
-            md = res.get("bundled_markdown", "")
-            files_count = len(res.get("dependency_files", []))
-            tokens = res.get("tokens", 0)
-
-            self.output_edit.setPlainText(md)
-            self.stat_label.setText(f"✓ {files_count} Datei(en) gebündelt ({tokens:,} Tokens).")
-
+            self.worker = TaskWorker(
+                trace_dependencies, entry_path, max_depth=self.depth_spin.value()
+            )
         else:
-            res = package_git_diff(
+            self.worker = TaskWorker(
+                package_git_diff,
                 Path.cwd(),
                 staged=self.staged_cb.isChecked(),
                 include_skeletons=self.diff_skel_cb.isChecked(),
             )
-            md = res.get("packaged_markdown", "")
-            files_count = len(res.get("diff_files", []))
-            tokens = res.get("tokens", 0)
 
-            self.output_edit.setPlainText(md)
+        self.package_btn.setEnabled(False)
+        self.stat_label.setText("Erzeuge Kontext-Paket...")
+        self.worker.finished.connect(self._on_package_finished)
+        self.worker.error.connect(self._on_package_error)
+        self.worker.start()
+
+    def _on_package_finished(self, res: dict) -> None:
+        self.package_btn.setEnabled(True)
+        tokens = res.get("tokens", 0)
+        if "bundled_markdown" in res:
+            self.output_edit.setPlainText(res["bundled_markdown"])
+            files_count = len(res.get("dependency_files", []))
+            self.stat_label.setText(f"✓ {files_count} Datei(en) gebündelt ({tokens:,} Tokens).")
+        else:
+            self.output_edit.setPlainText(res.get("packaged_markdown", ""))
+            files_count = len(res.get("diff_files", []))
             self.stat_label.setText(
                 f"✓ Git-Diff geladen: {files_count} geänderte Datei(en) ({tokens:,} Tokens)."
             )
+
+    def _on_package_error(self, err_msg: str) -> None:
+        self.package_btn.setEnabled(True)
+        self.stat_label.setText("Fehler beim Packen.")
+        QMessageBox.critical(self, "Fehler", f"Fehler beim Erzeugen des Kontext-Pakets:\n{err_msg}")
 
     def _copy_to_clipboard(self) -> None:
         text = self.output_edit.toPlainText()

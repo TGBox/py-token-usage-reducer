@@ -31,22 +31,22 @@ Activate this skill immediately whenever:
 
 ## How to Execute
 
-### Method 1: Using the Bundled Script
+### Method 1: CLI
 
-Run the executable script via `run_command`:
+Run the CLI via `run_command`:
 
 ```bash
-uv run python skills/codebase-architecture-reporter/scripts/generate_report.py [PATH] -o PROJECT_OVERVIEW.md
+uv run py-token-usage-reducer report [PATH] -o PROJECT_OVERVIEW.md
 ```
 
 Examples:
 
 ```bash
 # Scan current workspace and save report:
-uv run python skills/codebase-architecture-reporter/scripts/generate_report.py . -o PROJECT_OVERVIEW.md
+uv run py-token-usage-reducer report . -o PROJECT_OVERVIEW.md
 
 # Scan with API skeletons of key components included:
-uv run python skills/codebase-architecture-reporter/scripts/generate_report.py . --skeletons --max-skeletons 5 -o PROJECT_OVERVIEW.md
+uv run py-token-usage-reducer report . --skeletons --max-skeletons 5 -o PROJECT_OVERVIEW.md
 ```
 
 ### Method 2: In-Memory / Python Import

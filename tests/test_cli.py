@@ -49,3 +49,11 @@ def test_cli_gui_signal():
     # Running without arguments signals to launch the GUI (code 100)
     assert run_cli([]) == 100
     assert run_cli(["--gui"]) == 100
+
+
+def test_cli_compress_log_stdin(monkeypatch, capsys):
+    import io
+
+    monkeypatch.setattr("sys.stdin", io.StringIO("same line\n" * 10))
+    assert run_cli(["compress-log"]) == 0
+    assert "wiederholt ausgelassen" in capsys.readouterr().out

@@ -2,10 +2,7 @@
 
 import sys
 
-from PySide6.QtWidgets import QApplication
-
 from src.cli.parser import run_cli
-from src.gui.app import MainWindow
 
 
 def main() -> None:
@@ -15,6 +12,11 @@ def main() -> None:
 
     # Exit code 100 indicates that GUI should be launched (e.g. no args or --gui)
     if exit_code == 100:
+        # PySide6 + all tabs are heavy; CLI calls (e.g. from agent skills) shouldn't pay for them
+        from PySide6.QtWidgets import QApplication
+
+        from src.gui.app import MainWindow
+
         app = QApplication(sys.argv)
         window = MainWindow()
         window.show()

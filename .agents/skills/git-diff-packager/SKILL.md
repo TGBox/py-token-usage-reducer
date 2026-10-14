@@ -29,22 +29,22 @@ Activate this skill immediately whenever:
 
 ## How to Execute
 
-### Method 1: Using the Bundled Script
+### Method 1: CLI
 
 Run via `run_command`:
 
 ```bash
-uv run python skills/git-diff-packager/scripts/pack_diff.py [-r <REPO_PATH>] [--staged] [--no-skeletons] [-o <OUTPUT_PATH>]
+uv run py-token-usage-reducer diff-pack [<REPO_PATH>] [--staged] [--no-skeletons] [-o <OUTPUT_PATH>]
 ```
 
 Examples:
 
 ```bash
 # Package working tree diff with file skeletons and print to stdout:
-uv run python skills/git-diff-packager/scripts/pack_diff.py
+uv run py-token-usage-reducer diff-pack
 
 # Package staged changes into a review markdown file:
-uv run python skills/git-diff-packager/scripts/pack_diff.py --staged -o context/review_package.md
+uv run py-token-usage-reducer diff-pack --staged -o context/review_package.md
 ```
 
 ### Method 2: In-Memory / Python Import

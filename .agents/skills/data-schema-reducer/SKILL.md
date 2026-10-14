@@ -29,25 +29,25 @@ Activate this skill immediately whenever:
 
 ## How to Execute
 
-### Method 1: Using the Bundled Script
+### Method 1: CLI
 
-Run the executable script via `run_command`:
+Run the CLI via `run_command`:
 
 ```bash
-uv run python skills/data-schema-reducer/scripts/reduce_data.py <PATH_TO_DATA_FILE> [-s <SAMPLES>] [-o <OUTPUT_PATH>]
+uv run py-token-usage-reducer schema <PATH_TO_DATA_FILE> [-s <SAMPLES>] [-o <OUTPUT_PATH>]
 ```
 
 Examples:
 
 ```bash
 # Reduce a large JSON fixture to schema + 2 sample records:
-uv run python skills/data-schema-reducer/scripts/reduce_data.py tests/fixtures/users.json -s 2
+uv run py-token-usage-reducer schema tests/fixtures/users.json -s 2
 
 # Extract schema from a CSV file:
-uv run python skills/data-schema-reducer/scripts/reduce_data.py data/transactions.csv -o docs/transactions_schema.md
+uv run py-token-usage-reducer schema data/transactions.csv -o docs/transactions_schema.md
 
 # Prune bulk INSERT statements from a SQL dump:
-uv run python skills/data-schema-reducer/scripts/reduce_data.py db/backup.sql -o db/schema_only.sql
+uv run py-token-usage-reducer schema db/backup.sql -o db/schema_only.sql
 ```
 
 ### Method 2: In-Memory / Python Import

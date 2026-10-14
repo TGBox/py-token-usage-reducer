@@ -24,22 +24,22 @@ Activate this skill immediately whenever:
 
 ## How to Execute
 
-### Method 1: Using the Bundled Script
+### Method 1: CLI
 
 Run via `run_command`:
 
 ```bash
-uv run python skills/dependency-context-collector/scripts/trace_deps.py <ENTRY_FILE> [-r <PROJECT_ROOT>] [-d <MAX_DEPTH>] [-o <OUTPUT_PATH>]
+uv run py-token-usage-reducer trace-deps <ENTRY_FILE> [--root <PROJECT_ROOT>] [--depth <MAX_DEPTH>] [-o <OUTPUT_PATH>]
 ```
 
 Examples:
 
 ```bash
 # Trace dependencies of a CLI entry point:
-uv run python skills/dependency-context-collector/scripts/trace_deps.py src/cli/parser.py -r . -o context/cli_deps.md
+uv run py-token-usage-reducer trace-deps src/cli/parser.py -o context/cli_deps.md
 
 # Trace dependencies of a test file with depth 2:
-uv run python skills/dependency-context-collector/scripts/trace_deps.py tests/test_core.py -r . -d 2
+uv run py-token-usage-reducer trace-deps tests/test_core.py --depth 2
 ```
 
 ### Method 2: In-Memory / Python Import
@@ -48,7 +48,7 @@ uv run python skills/dependency-context-collector/scripts/trace_deps.py tests/te
 from src.modules.dep_tracer import trace_dependencies
 
 res = trace_dependencies("src/cli/parser.py", project_root=".", max_depth=3)
-print(f"Traced {res['file_count']} files ({res['total_tokens']} tokens)")
+print(f"Traced {len(res['dependency_files'])} files ({res['tokens']} tokens)")
 bundled_context = res["bundled_markdown"]
 ```
 

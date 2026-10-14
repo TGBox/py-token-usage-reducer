@@ -29,22 +29,22 @@ Activate this skill immediately whenever:
 
 ## How to Execute
 
-### Method 1: Using the Bundled Script
+### Method 1: CLI
 
-Run the executable script via `run_command`:
+Run the CLI via `run_command`:
 
 ```bash
-uv run python skills/document-to-markdown/scripts/convert_doc.py <PATH_TO_DOC> -o <OUTPUT_MD>
+uv run py-token-usage-reducer convert <PATH_TO_DOC> -o <OUTPUT_MD>
 ```
 
 Examples:
 
 ```bash
 # Convert a specification PDF:
-uv run python skills/document-to-markdown/scripts/convert_doc.py docs/spec.pdf -o docs/spec.md
+uv run py-token-usage-reducer convert docs/spec.pdf -o docs/spec.md
 
 # Convert a Jupyter notebook without outputs:
-uv run python skills/document-to-markdown/scripts/convert_doc.py notebooks/eda.ipynb -o docs/eda.md
+uv run py-token-usage-reducer convert notebooks/eda.ipynb -o docs/eda.md
 ```
 
 ### Method 2: In-Memory / Python Import

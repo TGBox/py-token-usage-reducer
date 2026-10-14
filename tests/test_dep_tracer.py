@@ -45,24 +45,3 @@ def test_default_root_is_project_root(tmp_path: Path):
 
     res = trace_dependencies(pkg / "main.py")
     assert len(res["dependency_files"]) == 2
-
-
-def test_trace_deps_skill_script(tmp_path: Path):
-    import subprocess
-    import sys
-
-    entry = tmp_path / "main.py"
-    entry.write_text("print(1)\n", encoding="utf-8")
-    script = (
-        Path(__file__).parents[1]
-        / ".agents/skills/dependency-context-collector/scripts/trace_deps.py"
-    )
-    out = tmp_path / "out.md"
-    res = subprocess.run(
-        [sys.executable, str(script), str(entry), "-o", str(out)],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    assert res.returncode == 0, res.stderr
-    assert out.is_file()

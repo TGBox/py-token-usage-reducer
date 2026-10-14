@@ -2,6 +2,7 @@
 
 from pathlib import Path
 
+from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import (
     QFileDialog,
     QGroupBox,
@@ -51,7 +52,12 @@ class TokenInspectorTab(QWidget):
         self.text_edit.setPlaceholderText(
             "Füge hier beliebigen Text, Code oder Prompt-Inhalte ein, um die Token-Nutzung live zu berechnen..."
         )
-        self.text_edit.textChanged.connect(self._update_metrics)
+        # Recount only after typing pauses; tiktoken over a large paste on every keystroke lags
+        self._recount_timer = QTimer(self)
+        self._recount_timer.setSingleShot(True)
+        self._recount_timer.setInterval(300)
+        self._recount_timer.timeout.connect(self._update_metrics)
+        self.text_edit.textChanged.connect(self._recount_timer.start)
         layout.addWidget(self.text_edit, stretch=1)
 
         # Metrics Card

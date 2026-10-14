@@ -4,12 +4,14 @@ import argparse
 import sys
 from pathlib import Path
 
+from src.core.text_utils import format_token_savings
+from src.core.tokenizer import count_tokens
 from src.docs.manual import TOOL_DOCS, get_tool_documentation
 from src.modules.converter import convert_to_markdown
 from src.modules.data_reducer import reduce_data_file
 from src.modules.dep_tracer import trace_dependencies
 from src.modules.diff_packager import package_git_diff
-from src.modules.log_compressor import compress_log_file
+from src.modules.log_compressor import compress_log_file, compress_logs
 from src.modules.reporter import generate_project_report
 from src.modules.skeletonizer import skeletonize_file
 
@@ -72,7 +74,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     # 5. compress-log
     p_log = subparsers.add_parser("compress-log", help=TOOL_DOCS["compress-log"].summary)
-    p_log.add_argument("file", help="Pfad zur Log- oder Traceback-Datei")
+    p_log.add_argument(
+        "file", nargs="?", help="Pfad zur Log- oder Traceback-Datei (ohne Angabe: stdin)"
+    )
     p_log.add_argument("-o", "--output", help="Ausgabepfad")
 
     # 6. trace-deps
@@ -111,6 +115,8 @@ def run_cli(args: list[str] | None = None) -> int:
     try:
         if hasattr(sys.stdout, "reconfigure"):
             sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        if hasattr(sys.stdin, "reconfigure"):
+            sys.stdin.reconfigure(encoding="utf-8", errors="replace")
         if hasattr(sys.stderr, "reconfigure"):
             sys.stderr.reconfigure(encoding="utf-8", errors="replace")
     except (AttributeError, ValueError):
@@ -158,7 +164,15 @@ def run_cli(args: list[str] | None = None) -> int:
             stats_info = f"Tokens: {res['original_tokens']:,} -> {res['reduced_tokens']:,} (-{res['percentage_saved']}%)"
 
         elif subcmd == "compress-log":
-            res = compress_log_file(parsed.file)
+            if parsed.file:
+                res = compress_log_file(parsed.file)
+            else:
+                raw = sys.stdin.read()
+                compressed = compress_logs(raw)
+                res = {
+                    "compressed_log": compressed,
+                    **format_token_savings(count_tokens(raw), count_tokens(compressed)),
+                }
             result_text = res["compressed_log"]
             stats_info = f"Tokens: {res['original_tokens']:,} -> {res['reduced_tokens']:,} (-{res['percentage_saved']}%)"
 

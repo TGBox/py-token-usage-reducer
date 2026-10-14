@@ -29,25 +29,25 @@ Activate this skill immediately whenever:
 
 ## How to Execute
 
-### Method 1: Using the Bundled Script
+### Method 1: CLI
 
 Run via `run_command` on a log file or piped input:
 
 ```bash
-uv run python skills/log-stacktrace-compressor/scripts/compress_log.py <PATH_TO_LOG_FILE> [-o <OUTPUT_PATH>]
+uv run py-token-usage-reducer compress-log <PATH_TO_LOG_FILE> [-o <OUTPUT_PATH>]
 ```
 
 Examples:
 
 ```bash
 # Compress a crash log and print to stdout:
-uv run python skills/log-stacktrace-compressor/scripts/compress_log.py tests/failure.log
+uv run py-token-usage-reducer compress-log tests/failure.log
 
 # Pipe a failing test run directly through the compressor:
-uv run pytest | uv run python skills/log-stacktrace-compressor/scripts/compress_log.py
+uv run pytest | uv run py-token-usage-reducer compress-log
 
 # Save the compressed output:
-uv run python skills/log-stacktrace-compressor/scripts/compress_log.py logs/server.log -o logs/server_clean.log
+uv run py-token-usage-reducer compress-log logs/server.log -o logs/server_clean.log
 ```
 
 ### Method 2: In-Memory / Python Import

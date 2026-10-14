@@ -31,22 +31,22 @@ Activate this skill immediately whenever:
 
 ## How to Execute
 
-### Method 1: Using the Bundled Script
+### Method 1: CLI
 
-Run the executable script via `run_command`:
+Run the CLI via `run_command`:
 
 ```bash
-uv run python skills/python-code-skeletonizer/scripts/skeletonize.py <PATH_TO_PY_FILE> [-o <OUTPUT_PATH>]
+uv run py-token-usage-reducer skeleton <PATH_TO_PY_FILE> [-o <OUTPUT_PATH>]
 ```
 
 Examples:
 
 ```bash
 # Skeletonize a database service and print to stdout:
-uv run python skills/python-code-skeletonizer/scripts/skeletonize.py src/database/client.py
+uv run py-token-usage-reducer skeleton src/database/client.py
 
 # Save skeleton interface file:
-uv run python skills/python-code-skeletonizer/scripts/skeletonize.py src/api/router.py -o docs/api_interface.py
+uv run py-token-usage-reducer skeleton src/api/router.py -o docs/api_interface.py
 ```
 
 ### Method 2: In-Memory / Python Import
