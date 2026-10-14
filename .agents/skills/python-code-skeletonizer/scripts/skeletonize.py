@@ -5,7 +5,7 @@ import argparse
 import sys
 from pathlib import Path
 
-repo_root = Path(__file__).resolve().parents[3]
+repo_root = Path(__file__).resolve().parents[4]
 if str(repo_root) not in sys.path:
     sys.path.insert(0, str(repo_root))
 
@@ -29,6 +29,10 @@ def main() -> None:
     result = skeletonize_file(input_path, keep_docstrings=not args.no_docstrings)
     skeleton = result["skeleton"]
 
+    # Windows pipes default to cp1252, which can't encode the ✓ status lines
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
     if args.output:
         out_p = Path(args.output)
         out_p.parent.mkdir(parents=True, exist_ok=True)
@@ -38,8 +42,6 @@ def main() -> None:
             f"✓ Tokens: {result['original_tokens']:,} → {result['reduced_tokens']:,} (-{result['percentage_saved']}%)"
         )
     else:
-        if hasattr(sys.stdout, "reconfigure"):
-            sys.stdout.reconfigure(encoding="utf-8", errors="replace")
         print(skeleton)
 
 

@@ -5,7 +5,7 @@ import argparse
 import sys
 from pathlib import Path
 
-repo_root = Path(__file__).resolve().parents[3]
+repo_root = Path(__file__).resolve().parents[4]
 if str(repo_root) not in sys.path:
     sys.path.insert(0, str(repo_root))
 
@@ -43,6 +43,10 @@ def main() -> None:
     files = result["diff_files"]
     tokens = result["tokens"]
 
+    # Windows pipes default to cp1252, which can't encode the ✓ status lines
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
     if args.output:
         out_p = Path(args.output)
         out_p.parent.mkdir(parents=True, exist_ok=True)
@@ -50,8 +54,6 @@ def main() -> None:
         print(f"✓ Diff-Paket gespeichert in: {out_p}")
         print(f"✓ {len(files)} geänderte Datei(en) gepackt ({tokens:,} Tokens)")
     else:
-        if hasattr(sys.stdout, "reconfigure"):
-            sys.stdout.reconfigure(encoding="utf-8", errors="replace")
         print(packaged_md)
 
 

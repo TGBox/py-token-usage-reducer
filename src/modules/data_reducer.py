@@ -76,9 +76,9 @@ def reduce_json(raw_json: str, max_samples: int = 2) -> str:
     return clean_markdown("\n\n".join(parts))
 
 
-def reduce_csv(raw_csv: str, max_rows: int = 3) -> str:
+def reduce_csv(raw_csv: str, max_rows: int = 3, delimiter: str = ",") -> str:
     """Extract column headers, infer types, and output minimal sample table."""
-    reader = csv.reader(io.StringIO(raw_csv.strip()))
+    reader = csv.reader(io.StringIO(raw_csv.strip()), delimiter=delimiter)
     rows = list(reader)
     if not rows:
         return "*Leere CSV-Daten.*"
@@ -168,7 +168,9 @@ def reduce_data_file(file_path: Path | str, max_samples: int = 3) -> dict[str, A
     if ext == ".json":
         reduced = reduce_json(raw_text, max_samples=max_samples)
     elif ext in (".csv", ".tsv"):
-        reduced = reduce_csv(raw_text, max_rows=max_samples)
+        reduced = reduce_csv(
+            raw_text, max_rows=max_samples, delimiter="\t" if ext == ".tsv" else ","
+        )
     elif ext == ".sql":
         reduced = reduce_sql(raw_text, max_inserts=max_samples)
     else:

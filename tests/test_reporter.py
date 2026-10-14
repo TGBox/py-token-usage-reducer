@@ -48,3 +48,24 @@ def helper():
     assert "API-Skelette zentraler Python-Komponenten" in report["markdown"]
     assert "def run_app():" in report["markdown"]
     assert "Starting app..." not in report["markdown"]  # Skeletonized body was removed!
+
+
+def test_scan_prunes_ignored_dirs(tmp_path: Path, monkeypatch):
+    from src.core.gitignore import GitIgnoreMatcher
+    from src.modules.reporter import _scan_repository_files
+
+    (tmp_path / "app.py").write_text("x = 1\n", encoding="utf-8")
+    venv = tmp_path / ".venv" / "lib"
+    venv.mkdir(parents=True)
+    (venv / "huge.py").write_text("y = 2\n", encoding="utf-8")
+
+    checked: list[Path] = []
+    original = GitIgnoreMatcher.is_ignored
+    monkeypatch.setattr(
+        GitIgnoreMatcher, "is_ignored", lambda self, p: checked.append(p) or original(self, p)
+    )
+
+    stats = _scan_repository_files(tmp_path)
+    assert [s.rel_path for s in stats] == ["app.py"]
+    # The walk must never descend into .venv
+    assert not any(".venv" in p.parts[:-1] for p in checked)

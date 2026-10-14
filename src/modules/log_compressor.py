@@ -64,6 +64,7 @@ def compress_logs(raw_logs: str, max_repeated_lines: int = 2) -> str:
     pruned_lines: list[str] = []
     skipped_framework_frames = 0
     in_python_traceback = False
+    in_skipped_frame = False
 
     for line in deduped_lines:
         if "Traceback (most recent call last):" in line:
@@ -75,7 +76,16 @@ def compress_logs(raw_logs: str, max_repeated_lines: int = 2) -> str:
             # Check if this line is an internal framework frame
             if FRAMEWORK_FRAME_PYTHON.search(line) or FRAMEWORK_FRAME_NODE.search(line):
                 skipped_framework_frames += 1
+                in_skipped_frame = True
                 continue
+            # Indented code lines below a skipped frame belong to it
+            if (
+                in_skipped_frame
+                and line.startswith((" ", "\t"))
+                and not line.lstrip().startswith('File "')
+            ):
+                continue
+            in_skipped_frame = False
             # End of traceback (Exception line typically starts without indent or with error name)
             if not line.startswith(" ") and not line.startswith("\t") and line.strip():
                 in_python_traceback = False

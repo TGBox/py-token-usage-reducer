@@ -1,6 +1,7 @@
 """Smart Dependency Context Collector: Recursively traces local module imports from an entrypoint file."""
 
 import ast
+from collections import deque
 from pathlib import Path
 from typing import Any
 
@@ -65,13 +66,25 @@ def trace_dependencies(
     if not entry_path.is_file():
         raise FileNotFoundError(f"Einstiegsdatei nicht gefunden: {entry_path}")
 
-    root = Path(project_root).resolve() if project_root else entry_path.parent
+    if project_root:
+        root = Path(project_root).resolve()
+    else:
+        # Absolute imports (`from src.x import y`) resolve against the project root, not the
+        # entry file's folder, so default to the nearest ancestor that looks like one.
+        root = next(
+            (
+                p
+                for p in entry_path.parents
+                if (p / ".git").exists() or (p / "pyproject.toml").is_file()
+            ),
+            entry_path.parent,
+        )
 
     visited: set[Path] = {entry_path}
-    queue: list[tuple[Path, int]] = [(entry_path, 0)]
+    queue: deque[tuple[Path, int]] = deque([(entry_path, 0)])
 
     while queue:
-        curr_path, depth = queue.pop(0)
+        curr_path, depth = queue.popleft()
         if depth >= max_depth:
             continue
 

@@ -63,3 +63,11 @@ def test_reduce_data_file(tmp_path: Path):
     res = reduce_data_file(f, max_samples=2)
     assert res["file_name"] == "big_data.json"
     assert res["percentage_saved"] > 50.0
+
+
+def test_reduce_tsv(tmp_path: Path):
+    f = tmp_path / "data.tsv"
+    f.write_text("a\tb\tc\n1\t2\t3\n", encoding="utf-8")
+    md = reduce_data_file(f)["reduced_markdown"]
+    assert "**b** (int)" in md
+    assert "| 1 | 2 | 3 |" in md

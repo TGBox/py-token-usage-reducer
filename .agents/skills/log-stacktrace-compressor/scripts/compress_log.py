@@ -5,7 +5,7 @@ import argparse
 import sys
 from pathlib import Path
 
-repo_root = Path(__file__).resolve().parents[3]
+repo_root = Path(__file__).resolve().parents[4]
 if str(repo_root) not in sys.path:
     sys.path.insert(0, str(repo_root))
 
@@ -36,6 +36,10 @@ def main() -> None:
         comp_tok = len(compressed) // 4
         pct = round(max(0, orig_tok - comp_tok) / orig_tok * 100, 1) if orig_tok else 0.0
 
+    # Windows pipes default to cp1252, which can't encode the ✓ status lines
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
     if args.output:
         out_p = Path(args.output)
         out_p.parent.mkdir(parents=True, exist_ok=True)
@@ -43,8 +47,6 @@ def main() -> None:
         print(f"✓ Bereinigter Log gespeichert in: {out_p}")
         print(f"✓ Tokens: {orig_tok:,} → {comp_tok:,} (-{pct}%)")
     else:
-        if hasattr(sys.stdout, "reconfigure"):
-            sys.stdout.reconfigure(encoding="utf-8", errors="replace")
         print(compressed)
 
 

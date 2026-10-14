@@ -112,6 +112,9 @@ def convert_html_to_markdown(html_content_or_path: Path | str) -> str:
 
     # Process headings
     for tag in soup.find_all(["h1", "h2", "h3", "h4", "h5", "h6", "p", "pre", "ul", "ol", "table"]):
+        # Text of blocks nested in list items / table cells is already emitted by the container
+        if tag.find_parent(["li", "td", "th"]):
+            continue
         name = tag.name
         text = tag.get_text(" ", strip=True)
         if not text:
@@ -132,7 +135,7 @@ def convert_html_to_markdown(html_content_or_path: Path | str) -> str:
         elif name in ("ul", "ol"):
             items = [
                 f"- {li.get_text(strip=True)}"
-                for li in tag.find_all("li")
+                for li in tag.find_all("li", recursive=False)
                 if li.get_text(strip=True)
             ]
             if items:

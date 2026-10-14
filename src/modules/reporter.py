@@ -1,5 +1,6 @@
 """Project Architecture & Codebase Reporter: Generates compact Markdown overviews of repositories."""
 
+import os
 import re
 from collections import Counter
 from dataclasses import dataclass
@@ -33,31 +34,35 @@ def _scan_repository_files(root_dir: Path) -> list[FileStat]:
     matcher = GitIgnoreMatcher(root_dir)
     file_stats: list[FileStat] = []
 
-    for path in root_dir.rglob("*"):
-        if not path.is_file():
-            continue
-        if matcher.is_ignored(path):
-            continue
-
-        try:
-            size = path.stat().st_size
-            # Skip massive binary files (> 5MB)
-            if size > 5 * 1024 * 1024:
+    for dirpath, dirnames, filenames in os.walk(root_dir):
+        # Prune ignored dirs in place so the walk never descends into .venv, .git, node_modules
+        dirnames[:] = [d for d in dirnames if not matcher.is_ignored(Path(dirpath, d))]
+        for name in filenames:
+            path = Path(dirpath, name)
+            if matcher.is_ignored(path):
                 continue
 
-            content = path.read_text(encoding="utf-8", errors="ignore")
-            # Heuristic check for binary files (e.g. null bytes)
-            if "\x00" in content:
-                continue
+            try:
+                size = path.stat().st_size
+                # Skip massive binary files (> 5MB)
+                if size > 5 * 1024 * 1024:
+                    continue
 
-            lines = len(content.splitlines())
-            tokens = count_tokens(content)
-            rel_str = path.relative_to(root_dir).as_posix()
-            file_stats.append(
-                FileStat(path=path, rel_path=rel_str, size_bytes=size, tokens=tokens, lines=lines)
-            )
-        except (OSError, UnicodeDecodeError):
-            continue
+                content = path.read_text(encoding="utf-8", errors="ignore")
+                # Heuristic check for binary files (e.g. null bytes)
+                if "\x00" in content:
+                    continue
+
+                lines = len(content.splitlines())
+                tokens = count_tokens(content)
+                rel_str = path.relative_to(root_dir).as_posix()
+                file_stats.append(
+                    FileStat(
+                        path=path, rel_path=rel_str, size_bytes=size, tokens=tokens, lines=lines
+                    )
+                )
+            except (OSError, UnicodeDecodeError):
+                continue
 
     return file_stats
 

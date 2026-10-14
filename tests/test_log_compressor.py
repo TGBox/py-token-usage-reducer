@@ -41,3 +41,20 @@ def test_compress_log_file(tmp_path: Path):
     res = compress_log_file(f)
     assert res["file_name"] == "server.log"
     assert res["percentage_saved"] > 0.0
+
+
+def test_skipped_frames_drop_their_code_lines():
+    raw = """Traceback (most recent call last):
+  File "/app/main.py", line 3, in <module>
+    run()
+  File "/venv/lib/python3.11/site-packages/flask/app.py", line 10, in run
+    return self.wsgi_app(environ)
+  File "/venv/lib/python3.11/site-packages/flask/app.py", line 20, in wsgi_app
+    response = self.handle_exception(e)
+ValueError: boom"""
+    out = compress_logs(raw)
+    assert "run()" in out
+    assert "wsgi_app(environ)" not in out
+    assert "handle_exception" not in out
+    assert "2 interne" in out
+    assert "ValueError: boom" in out

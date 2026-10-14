@@ -112,3 +112,14 @@ def test_convert_to_markdown_unified(tmp_path: Path):
     assert res["file_name"] == "notes.html"
     assert "## Notes" in res["markdown"]
     assert res["reduced_tokens"] > 0
+
+
+def test_convert_html_nested_blocks_not_duplicated():
+    html = (
+        "<ul><li><p>Hallo Welt</p><ul><li>Innen</li></ul></li></ul>"
+        "<table><tr><td><p>Zelle</p></td></tr></table>"
+    )
+    md = convert_html_to_markdown(html)
+    assert md.count("Hallo Welt") == 1
+    assert md.count("Innen") == 1
+    assert md.count("Zelle") == 1

@@ -34,3 +34,35 @@ def test_trace_dependencies(tmp_path: Path):
     assert "unused.py" not in deps
     assert "b_func" in result["bundled_markdown"]
     assert "unused_thing" not in result["bundled_markdown"]
+
+
+def test_default_root_is_project_root(tmp_path: Path):
+    (tmp_path / "pyproject.toml").write_text("", encoding="utf-8")
+    pkg = tmp_path / "src"
+    pkg.mkdir()
+    (pkg / "util.py").write_text("X = 1\n", encoding="utf-8")
+    (pkg / "main.py").write_text("from src.util import X\n", encoding="utf-8")
+
+    res = trace_dependencies(pkg / "main.py")
+    assert len(res["dependency_files"]) == 2
+
+
+def test_trace_deps_skill_script(tmp_path: Path):
+    import subprocess
+    import sys
+
+    entry = tmp_path / "main.py"
+    entry.write_text("print(1)\n", encoding="utf-8")
+    script = (
+        Path(__file__).parents[1]
+        / ".agents/skills/dependency-context-collector/scripts/trace_deps.py"
+    )
+    out = tmp_path / "out.md"
+    res = subprocess.run(
+        [sys.executable, str(script), str(entry), "-o", str(out)],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert res.returncode == 0, res.stderr
+    assert out.is_file()
