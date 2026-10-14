@@ -15,10 +15,12 @@ def test_tokenizer_basic():
 
 
 def test_estimate_token_cost():
-    cost = estimate_token_cost(1_000_000, "claude-3-5-sonnet")
-    assert cost == 3.00
-    cost_cheap = estimate_token_cost(1_000_000, "gpt-4o-mini")
-    assert cost_cheap == 0.15
+    cost = estimate_token_cost(1_000_000, "claude-sonnet-5.5")
+    assert cost == 2.00
+    cost_cheap = estimate_token_cost(1_000_000, "gemini-2.5-flash")
+    assert cost_cheap == 0.30
+    # Unknown model falls back to the default model's price
+    assert estimate_token_cost(1_000_000, "unknown") == cost
 
 
 def test_clean_markdown():

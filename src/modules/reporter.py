@@ -9,7 +9,7 @@ from typing import Any
 
 from src.core.gitignore import GitIgnoreMatcher
 from src.core.text_utils import clean_markdown
-from src.core.tokenizer import count_tokens, estimate_token_cost
+from src.core.tokenizer import PRICES_AS_OF, count_tokens, estimate_token_cost
 from src.modules.skeletonizer import skeletonize_code
 
 IMPORT_PY_REGEX = re.compile(
@@ -124,7 +124,7 @@ def generate_project_report(
     total_files = len(file_stats)
     total_lines = sum(f.lines for f in file_stats)
     total_tokens = sum(f.tokens for f in file_stats)
-    total_cost = estimate_token_cost(total_tokens, "claude-3-5-sonnet")
+    total_cost = estimate_token_cost(total_tokens)
 
     # Top token consumers
     top_consumers = sorted(file_stats, key=lambda f: f.tokens, reverse=True)[:10]
@@ -142,7 +142,10 @@ def generate_project_report(
         f"- **Analysierte Dateien**: {total_files}",
         f"- **Gesamte Codezeilen (LOC)**: {total_lines:,}",
         f"- **Gesamter Token-Bedarf**: {total_tokens:,} Tokens",
-        f"- **Geschätzte Input-Kosten (Claude 3.5 Sonnet)**: ~${total_cost:.4f}",
+        (
+            f"- **Geschätzte Input-Kosten (Claude Sonnet 5.5, Preisstand {PRICES_AS_OF})**: "
+            f"~${total_cost:.4f}"
+        ),
         "",
         "## 2. Top-Token-Verbraucher (Größte Dateien)",
         "| Datei | Zeilen | Tokens | % vom Gesamtprojekt |",

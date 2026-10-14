@@ -62,8 +62,6 @@ uv sync
 
 ```bash
 uv run py-token-usage-reducer --gui
-# oder alternativ:
-uv run main
 ```
 
 ### 2. Schnelle CLI-Befehle

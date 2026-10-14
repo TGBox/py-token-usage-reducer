@@ -113,7 +113,7 @@ class ConverterTab(QWidget):
             file_path,
             include_outputs=self.include_outputs_cb.isChecked(),
         )
-        self.worker.finished.connect(self._on_conversion_finished)
+        self.worker.result.connect(self._on_conversion_finished)
         self.worker.error.connect(self._on_conversion_error)
         self.worker.start()
 

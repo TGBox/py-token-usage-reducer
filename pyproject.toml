@@ -20,17 +20,7 @@ dependencies = [
 
 
 py-token-usage-reducer = "src.main:main"
-
-main = "src.main:main"
-
-test = "pytest:main"
-
-build = "src.build:main"
-
-format = "src.tools:format_code"
-
-lint = "src.tools:lint_code"
-
+ptur-build = "src.build:main"
 
 [dependency-groups]
 dev = [

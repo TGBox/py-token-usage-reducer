@@ -78,13 +78,20 @@ class ContextPackagerTab(QWidget):
         self.diff_group = QGroupBox("Git-Diff Einstellungen")
         diff_layout = QHBoxLayout(self.diff_group)
 
+        self.repo_edit = QLineEdit(str(Path.cwd()))
+        self.repo_edit.setPlaceholderText("Git-Repository wählen...")
+        self.repo_browse_btn = QPushButton("Ordner wählen...")
+        self.repo_browse_btn.setObjectName("secondaryButton")
+        self.repo_browse_btn.clicked.connect(self._browse_repo_dir)
+
         self.staged_cb = QCheckBox("Nur Staged Changes (--staged)")
         self.diff_skel_cb = QCheckBox("Schnittstellen-Skelette der betroffenen Dateien einbetten")
         self.diff_skel_cb.setChecked(True)
 
+        diff_layout.addWidget(self.repo_edit)
+        diff_layout.addWidget(self.repo_browse_btn)
         diff_layout.addWidget(self.staged_cb)
         diff_layout.addWidget(self.diff_skel_cb)
-        diff_layout.addStretch()
         layout.addWidget(self.diff_group)
         self.diff_group.setVisible(False)
 
@@ -135,6 +142,13 @@ class ContextPackagerTab(QWidget):
         if path:
             self.entry_edit.setText(path)
 
+    def _browse_repo_dir(self) -> None:
+        path = QFileDialog.getExistingDirectory(
+            self, "Git-Repository wählen", self.repo_edit.text()
+        )
+        if path:
+            self.repo_edit.setText(path)
+
     def _generate_package(self) -> None:
         if self.mode_deps_rb.isChecked():
             entry_path = self.entry_edit.text().strip()
@@ -148,16 +162,20 @@ class ContextPackagerTab(QWidget):
                 trace_dependencies, entry_path, max_depth=self.depth_spin.value()
             )
         else:
+            repo_dir = self.repo_edit.text().strip()
+            if not repo_dir or not Path(repo_dir).is_dir():
+                QMessageBox.warning(self, "Hinweis", "Bitte wähle ein gültiges Verzeichnis aus.")
+                return
             self.worker = TaskWorker(
                 package_git_diff,
-                Path.cwd(),
+                repo_dir,
                 staged=self.staged_cb.isChecked(),
                 include_skeletons=self.diff_skel_cb.isChecked(),
             )
 
         self.package_btn.setEnabled(False)
         self.stat_label.setText("Erzeuge Kontext-Paket...")
-        self.worker.finished.connect(self._on_package_finished)
+        self.worker.result.connect(self._on_package_finished)
         self.worker.error.connect(self._on_package_error)
         self.worker.start()
 

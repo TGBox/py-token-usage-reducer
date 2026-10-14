@@ -13,7 +13,11 @@ DIFF_FILE_REGEX = re.compile(r"^\s*diff --git a/(.*?)\s+b/(.*?)\s*$", re.MULTILI
 
 
 def get_git_diff(repo_dir: Path | str, staged: bool = False) -> str:
-    """Run git diff command in repository directory."""
+    """Run git diff command in repository directory.
+
+    Raises:
+        RuntimeError: git is missing or repo_dir is not a git repository.
+    """
     cmd = ["git", "diff", "--staged"] if staged else ["git", "diff"]
     try:
         res = subprocess.run(
@@ -25,9 +29,13 @@ def get_git_diff(repo_dir: Path | str, staged: bool = False) -> str:
             errors="ignore",
             check=False,
         )
-        return res.stdout
-    except (subprocess.SubprocessError, FileNotFoundError):
-        return ""
+    except FileNotFoundError as exc:
+        raise RuntimeError("Git wurde nicht gefunden. Ist Git installiert und im PATH?") from exc
+    if res.returncode != 0:
+        # First stderr line only: outside a repo git appends its whole usage text
+        first_line = (res.stderr.strip().splitlines() or ["unbekannter Fehler"])[0]
+        raise RuntimeError(f"git diff fehlgeschlagen in {repo_dir}: {first_line}")
+    return res.stdout
 
 
 def package_git_diff(

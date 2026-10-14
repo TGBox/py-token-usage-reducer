@@ -9,7 +9,8 @@ from PySide6.QtCore import QThread, Signal
 class TaskWorker(QThread):
     """Generic worker thread executing heavy reducer/scanner functions in background."""
 
-    finished = Signal(object)
+    # Not `finished`: that would shadow QThread's own finished() signal
+    result = Signal(object)
     error = Signal(str)
 
     def __init__(self, task_func: Callable[..., Any], *args: Any, **kwargs: Any) -> None:
@@ -21,6 +22,6 @@ class TaskWorker(QThread):
     def run(self) -> None:
         try:
             result = self.task_func(*self.args, **self.kwargs)
-            self.finished.emit(result)
+            self.result.emit(result)
         except Exception as exc:  # noqa: BLE001
             self.error.emit(str(exc))

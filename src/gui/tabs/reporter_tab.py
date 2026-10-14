@@ -124,7 +124,7 @@ class ReporterTab(QWidget):
             include_skeletons=self.skeletons_cb.isChecked(),
             max_skeleton_files=self.max_skel_spin.value(),
         )
-        self.worker.finished.connect(self._on_analysis_finished)
+        self.worker.result.connect(self._on_analysis_finished)
         self.worker.error.connect(self._on_analysis_error)
         self.worker.start()
 
@@ -141,7 +141,7 @@ class ReporterTab(QWidget):
 
         self.stat_label.setText(
             f"✓ Analyse abgeschlossen! {files} Dateien geprüft, {tokens:,} Tokens Gesamtprojekt "
-            f"(~${cost:.4f} auf Claude 3.5 Sonnet)."
+            f"(~${cost:.4f} geschätzt für Claude Sonnet 5.5)."
         )
 
     def _on_analysis_error(self, err_msg: str) -> None:

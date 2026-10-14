@@ -61,8 +61,6 @@ uv run py-token-usage-reducer guide [tool-name]
 
 # GUI starten
 uv run py-token-usage-reducer --gui
-# oder direkt das Skript:
-uv run main
 
 # Tests & Qualitätssicherung
 uv run pytest

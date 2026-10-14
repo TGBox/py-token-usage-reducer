@@ -16,7 +16,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from src.core.tokenizer import count_tokens, estimate_token_cost
+from src.core.tokenizer import PRICES_AS_OF, count_tokens, estimate_token_cost
 
 
 class TokenInspectorTab(QWidget):
@@ -71,7 +71,7 @@ class TokenInspectorTab(QWidget):
         # Context limit progress bars
         # 1. 32k limit
         layout_32k = QHBoxLayout()
-        self.label_32k = QLabel("32k Kontextfenster (Standard/Lokale Modelle):")
+        self.label_32k = QLabel("32k Kontextfenster (lokale Modelle):")
         self.bar_32k = QProgressBar()
         self.bar_32k.setRange(0, 32_000)
         self.bar_32k.setValue(0)
@@ -79,25 +79,25 @@ class TokenInspectorTab(QWidget):
         layout_32k.addWidget(self.bar_32k)
         metrics_layout.addLayout(layout_32k)
 
-        # 2. 128k limit
-        layout_128k = QHBoxLayout()
-        self.label_128k = QLabel("128k Kontextfenster (GPT-4o / gängige Modelle):")
-        self.bar_128k = QProgressBar()
-        self.bar_128k.setRange(0, 128_000)
-        self.bar_128k.setValue(0)
-        layout_128k.addWidget(self.label_128k)
-        layout_128k.addWidget(self.bar_128k)
-        metrics_layout.addLayout(layout_128k)
-
-        # 3. 200k limit
+        # 2. 200k limit
         layout_200k = QHBoxLayout()
-        self.label_200k = QLabel("200k Kontextfenster (Claude 3.5 Sonnet):")
+        self.label_200k = QLabel("200k Kontextfenster:")
         self.bar_200k = QProgressBar()
         self.bar_200k.setRange(0, 200_000)
         self.bar_200k.setValue(0)
         layout_200k.addWidget(self.label_200k)
         layout_200k.addWidget(self.bar_200k)
         metrics_layout.addLayout(layout_200k)
+
+        # 3. 1M limit
+        layout_1m = QHBoxLayout()
+        self.label_1m = QLabel("1M Kontextfenster (Claude Opus/Sonnet 5.5, Gemini 3.1 Pro):")
+        self.bar_1m = QProgressBar()
+        self.bar_1m.setRange(0, 1_000_000)
+        self.bar_1m.setValue(0)
+        layout_1m.addWidget(self.label_1m)
+        layout_1m.addWidget(self.bar_1m)
+        metrics_layout.addLayout(layout_1m)
 
         # Cost Estimate Label
         self.cost_label = QLabel("Geschätzte Kosten pro Durchlauf: ~0.00 $")
@@ -130,17 +130,17 @@ class TokenInspectorTab(QWidget):
         )
 
         self.bar_32k.setValue(min(32_000, tok_count))
-        self.bar_128k.setValue(min(128_000, tok_count))
         self.bar_200k.setValue(min(200_000, tok_count))
+        self.bar_1m.setValue(min(1_000_000, tok_count))
 
         # Costs
-        cost_sonnet = estimate_token_cost(tok_count, "claude-3-5-sonnet")
-        cost_gpt4o = estimate_token_cost(tok_count, "gpt-4o")
-        cost_mini = estimate_token_cost(tok_count, "gpt-4o-mini")
+        cost_sonnet = estimate_token_cost(tok_count, "claude-sonnet-5.5")
+        cost_gpt = estimate_token_cost(tok_count, "gpt-5.5")
+        cost_gemini = estimate_token_cost(tok_count, "gemini-3.1-pro")
 
         self.cost_label.setText(
-            f"Geschätzte Input-Kosten pro Anfrage: "
-            f"Claude 3.5 Sonnet: ${cost_sonnet:.5f} | "
-            f"GPT-4o: ${cost_gpt4o:.5f} | "
-            f"GPT-4o-mini: ${cost_mini:.5f}"
+            f"Geschätzte Input-Kosten pro Anfrage (Preisstand {PRICES_AS_OF}): "
+            f"Claude Sonnet 5.5: ${cost_sonnet:.5f} | "
+            f"GPT-5.5: ${cost_gpt:.5f} | "
+            f"Gemini 3.1 Pro: ${cost_gemini:.5f}"
         )

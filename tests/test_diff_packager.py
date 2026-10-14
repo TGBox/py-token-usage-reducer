@@ -39,3 +39,12 @@ def test_package_git_diff_empty(tmp_path: Path):
     assert (
         "Keine ungespeicherten oder geänderten Git-Änderungen gefunden" in res["packaged_markdown"]
     )
+
+
+def test_git_diff_outside_repo_raises(tmp_path: Path):
+    import pytest
+
+    from src.modules.diff_packager import get_git_diff
+
+    with pytest.raises(RuntimeError):
+        get_git_diff(tmp_path)
